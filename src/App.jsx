@@ -263,6 +263,7 @@ export default function App() {
 
     // Send email notification
     await sendEmailNotification(booking);
+    await fetchBookings();
 
     setSubmitStatus("success");
     showToast("Request submitted! The owner will review it shortly.");
@@ -285,6 +286,7 @@ export default function App() {
 
     const { error } = await supabase.from("bookings").update({ status: "approved" }).eq("id", id);
     if (error) { showToast("Error approving", "error"); return; }
+    await fetchBookings();
     showToast(`Approved ${booking.guest_name}'s stay!`);
   };
 
@@ -292,6 +294,7 @@ export default function App() {
     const booking = bookings.find(b => b.id === id);
     const { error } = await supabase.from("bookings").update({ status: "rejected" }).eq("id", id);
     if (error) { showToast("Error rejecting", "error"); return; }
+    await fetchBookings();
     showToast(`Rejected ${booking.guest_name}'s request. Dates are now open.`);
   };
 
@@ -299,12 +302,14 @@ export default function App() {
     const booking = bookings.find(b => b.id === id);
     const { error } = await supabase.from("bookings").update({ status: "rejected" }).eq("id", id);
     if (error) { showToast("Error revoking", "error"); return; }
+    await fetchBookings();
     showToast(`Revoked ${booking.guest_name}'s approval. Dates are now open.`);
   };
 
   const handleDeleteBooking = async (id) => {
     const { error } = await supabase.from("bookings").delete().eq("id", id);
     if (error) { showToast("Error deleting", "error"); return; }
+    await fetchBookings();
     showToast("Booking removed.");
   };
 
